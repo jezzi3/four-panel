@@ -3,54 +3,64 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Project Arclight — Four‑Panel Gateway</title>
+  <title>Project Arclight — Four-Panel Gateway</title>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=VT323&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box}
-    :root{ --ink:#e8ecf1; --bg:#0f1626; --dark-ink:#1b2233; --highlight:#8B6E46; }
+    :root{ --ink:#e8ecf1; --bg:#0f1626; --dark-ink:#1b2233; --highlight:#8B6E46; --accent:#8B6E46; }
     body{margin:0;height:100vh;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Sora',sans-serif}
 
-    .quad{display:grid;grid-template-columns:repeat(4,1fr);height:100vh;width:100vw}
-    @media (max-width:900px){ .quad{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:560px){ .quad{grid-template-columns:1fr} }
+    .quad{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr;height:100vh;width:100vw}
+    @media (max-width:900px){ .quad{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)} }
+    @media (max-width:560px){ .quad{grid-template-columns:1fr;grid-template-rows:repeat(4,1fr)} }
 
-    .panel{position:relative;display:block;cursor:pointer;color:var(--ink);perspective:1000px}
+    .panel{position:relative;display:block;width:100%;height:100%;cursor:pointer;color:var(--ink);perspective:1000px}
     .flip{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:center;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
     .panel.flipped .flip{transform:rotateY(-180deg)}
 
     .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
 
-    /* FRONT */
-    .front{background:var(--bg);padding:0 10px}
-    .label{font-family:'VT323', monospace;font-size:clamp(28px,3vw,48px);text-transform:uppercase;margin-bottom:20px;text-align:center;line-height:1.1}
-    .desc{font-size:14px;font-style:italic;color:color-mix(in oklab,var(--ink) 90%, white);opacity:.9;text-align:center}
+    .front{background:var(--bg);padding:0 10px;width:100%;height:100%;position:relative}
+    .label{font-family:'VT323', monospace;font-size:clamp(28px,3vw,48px);text-transform:uppercase;margin-bottom:20px;text-align:center;line-height:1.1;position:relative;z-index:2}
+    .desc{font-size:14px;font-style:italic;color:color-mix(in oklab,var(--ink) 90%, white);opacity:.9;text-align:center;position:relative;z-index:2;line-height:1.2;min-height:2.6em}
 
-    /* Highlight one panel (brown + parchment) */
-    .panel.active .front{background-color:var(--highlight);background-image:url('https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg');background-size:cover;background-position:center;color:var(--dark-ink)}
+    /* Outer frame */
+    .front::before{content:"";position:absolute;inset:18px;border:1px solid rgba(255,255,255,.18);border-radius:16px;z-index:0}
+    /* Inner frame */
+    .front::after{content:"";position:absolute;inset:26px;border:1px solid rgba(255,255,255,.25);border-radius:10px;z-index:1}
+
+    /* Fill both inner and outer area when active */
+    .panel.active .front::before,
+    .panel.active .front::after{
+      background-color:var(--highlight);
+      background-image:url('https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg');
+      background-size:cover;
+      background-position:center;
+      border-color:rgba(0,0,0,0.4);
+    }
+
+    .front i.corner{position:absolute;width:16px;height:16px;border:2px solid var(--accent);opacity:.8;z-index:3}
+    .front i.tl{top:18px;left:18px;border-right:none;border-bottom:none;border-radius:6px 0 0 0}
+    .front i.tr{top:18px;right:18px;border-left:none;border-bottom:none;border-radius:0 6px 0 0}
+    .front i.bl{bottom:18px;left:18px;border-right:none;border-top:none;border-radius:0 0 0 6px}
+    .front i.br{bottom:18px;right:18px;border-left:none;border-top:none;border-radius:0 0 6px 0}
+
     .panel.active .label,.panel.active .desc{color:var(--dark-ink)}
 
-    /* BACK (art image should stay proportional) */
-    .back{background:var(--bg);transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;padding:8px}
-    .back img.art {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      image-rendering: auto;
-    }
+    .back{background:var(--bg);transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;padding:8px;width:100%;height:100%}
+    .back img.art {width:100%;height:100%;object-fit:cover;object-position:center;image-rendering:auto}
   </style>
 </head>
 <body>
   <main class="quad">
-    <!-- Panel 1 with WEBP art on the back -->
     <a class="panel" id="panel-1" href="#game">
       <div class="flip">
         <div class="face front">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <div class="label">PROJECT ARCLIGHT</div>
           <div class="desc">JRPG • Fantasy • TCG</div>
         </div>
         <div class="face back">
-          <!-- Put girl.webp in the same folder as this HTML -->
           <img class="art" src="girl.webp" alt="Character Art" />
         </div>
       </div>
@@ -59,8 +69,9 @@
     <a class="panel" href="#classes">
       <div class="flip">
         <div class="face front">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <div class="label">CLASSES</div>
-          <div class="desc">Paladin • Rogue • Mage • More coming</div>
+          <div class="desc">Paladin • Archer • Rogue<br>and more</div>
         </div>
         <div class="face back"></div>
       </div>
@@ -69,6 +80,7 @@
     <a class="panel" href="#who">
       <div class="flip">
         <div class="face front">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <div class="label">WHO ARE WE</div>
           <div class="desc">Hi, nice to meet you.</div>
         </div>
@@ -79,6 +91,7 @@
     <a class="panel" href="#join">
       <div class="flip">
         <div class="face front">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
           <div class="label">JOIN</div>
           <div class="desc">Be first to know.</div>
         </div>
@@ -92,7 +105,6 @@
       const panels = Array.from(document.querySelectorAll('.panel'));
       if (!panels.length) return;
 
-      // One highlighted at all times
       let active = panels[0];
       active.classList.add('active');
 
@@ -101,7 +113,6 @@
         active = p; active.classList.add('active');
       }
 
-      // Persistent flip: click to flip; click again to unflip; flipping another unflips the previous
       let flipped = null;
       function toggleFlip(p){
         if (flipped === p){ p.classList.remove('flipped'); flipped = null; return; }
